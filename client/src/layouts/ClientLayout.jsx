@@ -10,8 +10,8 @@ function ClientLayout() {
             <Navbar />
 
             {/* Main Content Area */}
-            <main className="flex-grow mt-[8rem]"> {/* Add margin top to accommodate fixed header */}
-                <div className="container mx-auto px-4">
+            <main className="flex-grow mt-[8rem] w-full">
+                <div className="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8 max-w-screen-xl">
                     <Outlet />
                 </div>
             </main>
@@ -21,5 +21,7 @@ function ClientLayout() {
         </div>
     );
 }
+
+
 
 export default ClientLayout;
