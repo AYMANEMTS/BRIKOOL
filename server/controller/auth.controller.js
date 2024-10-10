@@ -35,4 +35,20 @@ const logout = async (req,res) => {
     }
 }
 
-module.exports = {registerClient,loginClient,logout};
+const authenticateToken = (req, res) => {
+    const token = req.cookies.jwt; // Get token from HTTP-only cookie
+
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({ message: "Token expired or invalid" });
+        }
+        req.user = decoded; // Attach the decoded token (user) to the request
+        res.status(200).send({ message: "Token has been checked successfully" });
+    });
+};
+
+module.exports = {registerClient,loginClient,logout,authenticateToken};

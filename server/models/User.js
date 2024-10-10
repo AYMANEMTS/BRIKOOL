@@ -4,11 +4,14 @@ const UserSchema = mongoose.Schema( {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    phone: { type: String, required: false },
-    cin: { type: String, required: false },
     image: { type: String, required: false },
-    address: { type: String, required: false },
+    city: { type: String, required: false },
     role: { type: String, default: "client" },
+    status: {
+        type: String,
+        enum: ['verified', 'inverified', 'suspended'], // Define the allowed values for the enum
+        default: 'inverified' // Set the default value
+    },
     permissions: { type: [String], default: [], required: false },
 }, {
     timestamps: true

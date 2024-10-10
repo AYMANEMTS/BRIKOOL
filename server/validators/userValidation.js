@@ -17,6 +17,9 @@ exports.createClientValidation = [
     check('password')
         .notEmpty().withMessage('Password is required')
         .isLength({min:7}).withMessage('Minimum character is 7'),
+
+    check('city')
+        .notEmpty().withMessage('City is required')
 ]
 
 exports.loginValidation = [

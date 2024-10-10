@@ -1,10 +1,15 @@
 const mongoose = require('mongoose');
 
 const JobSchema = mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     image: {type: String, required: false},
     description: {type: String, required:true,min:10},
     contact: {type: [String],required: true,default: []},
-    status: {type: String, default: "active"},
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'suspended'], // Define the allowed values for the enum
+        default: 'active' // Set the default value
+    },
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
     ratings : [{
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

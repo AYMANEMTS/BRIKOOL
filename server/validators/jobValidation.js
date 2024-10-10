@@ -24,17 +24,17 @@ exports.jobForm = [
 
     check('status')
         .optional()
-        .isIn(['active', 'inactive','suspend']).withMessage('Status must be either active or inactive'),
+        .isIn(['active', 'inactive','suspended']).withMessage('Status must be either active or inactive'),
 
     check('category')
         .notEmpty().withMessage('Category is required')
         .isMongoId().withMessage('Invalid category ID format'),  
 
-    check('reviews.*.userId')
+    check('ratings.*.userId')
         .optional()
         .isMongoId().withMessage('Invalid user ID format for review'), // Validate userId in reviews if present
 
-    check('reviews.*.rating')
+    check('ratings.*.rating')
         .optional()
         .isNumeric().withMessage('Rating must be a number')
         .isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'), // Validate rating value
