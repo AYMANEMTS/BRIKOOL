@@ -1,6 +1,5 @@
 import React from 'react';
 import Carousel from "react-multi-carousel";
-import ButtonGroup from "../../ButtonGroup";
 import WorkerCard from "../WorkerCard";
 
 function AvailableWorkes() {

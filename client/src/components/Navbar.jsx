@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Link} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import Dropdown from '@mui/joy/Dropdown';
 import Menu from '@mui/joy/Menu';
 import MenuButton from '@mui/joy/MenuButton';
@@ -9,35 +9,55 @@ import FRpng from '../flags-emoji/fr.png'
 import USpng from '../flags-emoji/us.png'
 import sun from '../images/sun-svgrepo-com.png'
 import AuthModal from "./auth/AuthModal";
+import LoginIcon from '@mui/icons-material/Login';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import PersonIcon from '@mui/icons-material/Person';
+import ChatIcon from '@mui/icons-material/Chat';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import TuneIcon from '@mui/icons-material/Tune';
+import LogoutIcon from '@mui/icons-material/Logout';
+import {Button} from "@mui/material";
+import ClientApi from "../api/ClientApi";
 export default function Navbar() {
-    const [isVisible, setIsVisible] = useState(true);
-    const [lastScrollTop, setLastScrollTop] = useState(0);
+    const [isAtTop, setIsAtTop] = useState(true);
     const [darkMode, setDarkMode] = useState(false)
     const [open, setOpen] = useState(false)
+    const navigate = useNavigate()
+    const handleOpen = () => setOpen(!open)
+    const {pathname} = useLocation()
+    const authenticated = localStorage.getItem('authenticated')
     useEffect(() => {
+        // Scroll event listener to check if scroll position is at the top
         const handleScroll = () => {
-            const currentScrollTop = window.pageYOffset;
-
-            // Show the search bar if scrolling up and hide if scrolling down
-            if (currentScrollTop > lastScrollTop) {
-                setIsVisible(false); // Scrolling down
+            if (window.scrollY === 0) {
+                setIsAtTop(true); // User is at the top
             } else {
-                setIsVisible(true); // Scrolling up
+                setIsAtTop(false); // User scrolled away from the top
             }
-            setLastScrollTop(currentScrollTop <= 0 ? 0 : currentScrollTop); // For Mobile or negative scrolling
         };
 
+        // Attach event listener
         window.addEventListener('scroll', handleScroll);
+
+        // Cleanup event listener on component unmount
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, [lastScrollTop]);
-    const handleOpen = () => setOpen(!open)
-    const IconButton = MApng
+    }, []);
+    const handleLogout = async () => {
+        try {
+            const res = await ClientApi.logout();
+            localStorage.clear();
+            window.location.href = '/';
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
     return (
         <>
-            <header className='fixed top-0 left-0 right-0 border-b bg-white font-sans min-h-[60px] px-10 py-3 z-50'>
+            <header className={`fixed top-0 left-0 right-0 border-b bg-white font-sans min-h-[60px] px-10 py-3 z-50 `}>
                 <div className='flex flex-wrap items-center max-lg:gap-y-6 max-sm:gap-x-4'>
+                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                     <a href="">
                         <img src="https://readymadeui.com/readymadeui.svg" alt="logo" className='w-36'/>
                     </a>
@@ -77,22 +97,47 @@ export default function Navbar() {
                         {/* Icons on the right */}
                         <div className="flex space-x-4">
                             {/* left to right */}
+
                             {/* account icon */}
-                            <span onClick={handleOpen}
-                                className="flex items-center justify-center w-10 h-10 cursor-pointer rounded-full bg-gray-200 hover:bg-blue-500 transition duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" className={"size-5"}>
-                                <path
-                                    d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"/>
-                            </svg>
-                        </span>
-                            {/* support icon */}
-                            <span
-                                className="flex items-center cursor-pointer justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-blue-500 transition duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className={"size-6"}>
-                                <path
-                                    d="M256 48C141.1 48 48 141.1 48 256l0 40c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-40C0 114.6 114.6 0 256 0S512 114.6 512 256l0 144.1c0 48.6-39.4 88-88.1 88L313.6 488c-8.3 14.3-23.8 24-41.6 24l-32 0c-26.5 0-48-21.5-48-48s21.5-48 48-48l32 0c17.8 0 33.3 9.7 41.6 24l110.4 .1c22.1 0 40-17.9 40-40L464 256c0-114.9-93.1-208-208-208zM144 208l16 0c17.7 0 32 14.3 32 32l0 112c0 17.7-14.3 32-32 32l-16 0c-35.3 0-64-28.7-64-64l0-48c0-35.3 28.7-64 64-64zm224 0c35.3 0 64 28.7 64 64l0 48c0 35.3-28.7 64-64 64l-16 0c-17.7 0-32-14.3-32-32l0-112c0-17.7 14.3-32 32-32l16 0z"/>
-                            </svg>
-                        </span>
+
+                            {authenticated ? (
+                                <Dropdown>
+                                    <MenuButton startDecorator={<PersonIcon />}
+                                        sx={{
+                                            borderRadius: 59,
+                                            padding: 1.2,
+                                            backgroundColor: "gray",
+                                            "&:hover": {
+                                                backgroundColor: "darkgray", // Change this to the color you want on hover
+                                            },
+                                        }}
+                                    >Aymane Moutousse</MenuButton>
+
+                                    <Menu>
+                                        <MenuItem onClick={() => navigate("/announces")}>
+                                           <CampaignIcon fontSize={"medium"} />Announces
+                                        </MenuItem>
+                                        <MenuItem onClick={() => navigate("/chat")}>
+                                            <ChatIcon fontSize={"medium"} />Chat
+                                        </MenuItem>
+                                        <MenuItem onClick={() => navigate("/settings")} >
+                                            <TuneIcon fontSize={"medium"} />Settings
+                                        </MenuItem>
+                                        <MenuItem>
+                                            <SupportAgentIcon fontSize={"medium"} />Support
+                                        </MenuItem>
+                                        <MenuItem onClick={handleLogout}>
+                                            <LogoutIcon fontSize={"medium"} />Logout
+                                        </MenuItem>
+                                    </Menu>
+                                </Dropdown>
+                            ) : (
+                                <Button variant="outlined" startIcon={<LoginIcon />} onClick={handleOpen}>
+                                    Sign in
+                                </Button>
+                            )}
+
+                            {/* trudiction button */}
                             <Dropdown>
                                 <MenuButton
                                     sx={{
@@ -124,8 +169,8 @@ export default function Navbar() {
                             {darkMode ? (
                                 <span onClick={() => setDarkMode(!darkMode)}
                                       className="flex items-center justify-center cursor-pointer w-10 h-10 rounded-full bg-gray-200 hover:bg-blue-500 transition duration-300">
-                                <img src={sun} alt={"light mode"} className={"w-6 h-6"}/>
-                        </span>
+                                    <img src={sun} alt={"light mode"} className={"w-6 h-6"}/>
+                            </span>
                             ) : (
                                 <span onClick={() => setDarkMode(!darkMode)}
                                       className="flex items-center justify-center cursor-pointer w-10 h-10 rounded-full bg-gray-200 hover:bg-blue-500 transition duration-300">
@@ -141,16 +186,23 @@ export default function Navbar() {
                     </div>
                 </div>
 
-                {isVisible && (
+                {isAtTop && pathname !== '/chat' && (
                     <div
-                        className="bg-gray-100 border border-transparent focus-within:border-blue-500 focus-within:bg-transparent flex px-6 rounded-full h-10 lg:w-2/4 mt-3 mx-auto max-lg:mt-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
-                             className="fill-gray-600 mr-3 rotate-90">
-                            <path
-                                d="M81.229,163.393c-44.294,0-80.44-36.146-80.44-80.44c0-44.294,36.146-80.44,80.44-80.44 c44.294,0,80.44,36.146,80.44,80.44C161.669,127.247,125.523,163.393,81.229,163.393z M81.229,15.998 c-36.048,0-65.436,29.387-65.436,65.436c0,36.048,29.387,65.436,65.436,65.436c36.048,0,65.436-29.387,65.436-65.436 C146.665,45.385,117.277,15.998,81.229,15.998z M97.13,81.229c0-8.199-6.662-14.861-14.861-14.861c-8.199,0-14.861,6.662-14.861,14.861c0,8.199,6.662,14.861,14.861,14.861 C90.468,96.09,97.13,89.428,97.13,81.229z M121.885,111.164c-3.149-3.149-8.224-3.149-11.373,0c-3.149,3.149-3.149,8.224,0,11.373 c3.149,3.149,8.224,3.149,11.373,0C125.034,119.388,125.034,114.313,121.885,111.164z"/>
+                        className="hidden md:flex bg-gray-100 border border-transparent focus-within:border-blue-500 focus-within:bg-transparent  px-6 rounded-full h-10 lg:w-2/4 mt-3 mx-auto max-lg:mt-6"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 192.904 192.904"
+                            width="16px"
+                            className="fill-gray-600 mr-3 rotate-90"
+                        >
+                            <path d="M81.229,163.393c-44.294,0-80.44-36.146-80.44-80.44c0-44.294,36.146-80.44,80.44-80.44 c44.294,0,80.44,36.146,80.44,80.44C161.669,127.247,125.523,163.393,81.229,163.393z M81.229,15.998 c-36.048,0-65.436,29.387-65.436,65.436c0,36.048,29.387,65.436,65.436,65.436c36.048,0,65.436-29.387,65.436-65.436 C146.665,45.385,117.277,15.998,81.229,15.998z M97.13,81.229c0-8.199-6.662-14.861-14.861-14.861c-8.199,0-14.861,6.662-14.861,14.861c0,8.199,6.662,14.861,14.861,14.861 C90.468,96.09,97.13,89.428,97.13,81.229z M121.885,111.164c-3.149-3.149-8.224-3.149-11.373,0c-3.149,3.149-3.149,8.224,0,11.373 c3.149,3.149,8.224,3.149,11.373,0C125.034,119.388,125.034,114.313,121.885,111.164z" />
                         </svg>
-                        <input type='text' placeholder='Search...'
-                               className="w-full outline-none bg-transparent text-gray-600 font-semibold text-[15px]"/>
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-full outline-none bg-transparent text-gray-600 font-semibold text-[15px]"
+                        />
                     </div>
                 )}
             </header>

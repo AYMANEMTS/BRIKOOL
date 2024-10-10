@@ -1,27 +1,30 @@
 import React from "react";
-import {Outlet} from "react-router-dom";
+import {Outlet, useLocation} from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 function ClientLayout() {
+    const {pathname} = useLocation()
+
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className={`flex flex-col min-h-screen ${pathname !== '/chat' && 'mt-36'} `}>
             {/* Navbar */}
             <Navbar />
 
             {/* Main Content Area */}
-            <main className="flex-grow mt-[8rem] w-full">
-                <div className="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8 max-w-screen-xl">
+            <main className="flex-grow w-full h-full">
+                <div className="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8 max-w-screen-xl h-full">
                     <Outlet />
                 </div>
             </main>
 
+
             {/* Footer */}
-            <Footer />
+            {/*{pathname === '/chat' ? '' : <Footer/>}*/}
+            <Footer/>
         </div>
     );
 }
-
 
 
 export default ClientLayout;

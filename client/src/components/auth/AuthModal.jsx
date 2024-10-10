@@ -1,34 +1,38 @@
-import React from 'react';
-import {Modal, ModalClose, Sheet, Typography} from "@mui/joy";
-import {Login} from "@mui/icons-material";
+import React, {useState} from 'react';
+import { Modal, ModalClose, ModalDialog } from "@mui/joy";
+import LoginForm from "./LoginForm";
+import RegisterForm from "./RegisterForm";
 
-function AuthModal({open,handleOpen}) {
+function AuthModal({ open, handleOpen }) {
+    const [swapForm, setSwapForm] = useState(false)
+    const handllSwapForm = () => setSwapForm(!swapForm)
     return (
         <Modal
             aria-labelledby="modal-title"
             aria-describedby="modal-desc"
             open={open}
             onClose={() => handleOpen()}
-            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
         >
-            <Sheet
-                variant="outlined"
-                sx={{ maxWidth: 500, borderRadius: 'md', p: 3, boxShadow: 'lg' }}
+            <ModalDialog
+                sx={{
+                    width: '100%',
+                    maxWidth: 500,  // Max width for larger screens
+                    padding: 2,
+                    '@media (max-width: 600px)': {
+                        width: '90%',  // Take up 90% of the viewport width on small screens
+                        maxWidth: 'none',  // No max width for mobile
+                    },
+                }}
             >
                 <ModalClose variant="plain" sx={{ m: 1 }} />
-                <Typography
-                    component="h2"
-                    id="modal-title"
-                    level="h4"
-                    textColor="inherit"
-                    sx={{ fontWeight: 'lg', mb: 1 }}
-                >
-                    This is the modal title
-                </Typography>
-                <div id="modal-desc" >
-                    <Login />
-                </div>
-            </Sheet>
+                {swapForm ? <RegisterForm handllSwapForm={handllSwapForm} handleOpen={handleOpen} /> : <LoginForm handleOpen={handleOpen} handllSwapForm={handllSwapForm}/>}
+
+            </ModalDialog>
         </Modal>
     );
 }
